@@ -73,7 +73,7 @@ class Dashboard():
 #        self.background_label = Label(self.master, image=background_image)
 #        self.background_label.image = background_image
 #        self.background_label.place(x=0, y=0, relwidth=1, relheight=1)
-
+        self.text_bg = 'sky blue'
                      
       
         self.banner_frame = Frame(self.master,borderwidth=5, width=100, height=500)
@@ -228,7 +228,7 @@ class Dashboard():
                 Label (self.event_frame,text=global_event_log[this_event_no][4], font = detail_font).grid(row = this_row, column=6,columnspan=1)
                 Label (self.event_frame,text=global_event_log[this_event_no][5], font = detail_font).grid(row = this_row, column=7,columnspan=1)
                 Label (self.event_frame,text=global_event_log[this_event_no][6], font = detail_font, fg = 'blue').grid(row = this_row, column=8,columnspan=3)
-                Label (self.event_frame,text=global_event_log[this_event_no][7], font = detail_font).grid(row = this_row, column=11,columnspan=3,sticky=W)
+                Label (self.event_frame,text=global_event_log[this_event_no][7], font = detail_font).grid(row = this_row, column=11,columnspan=3)
 
 
 
@@ -300,52 +300,6 @@ class Dashboard():
         global_phase='Random Events'
         self.update_stuff()
         
-        
-    def roll_initiative(self):
-        global global_phase
-        
-        self.action_window()
-        text_bg = 'sky blue'
-        
-        die_results = self.roll_dice(2)
-        die_total = die_results[0]
-        die_confederate = die_results[1][0]
-        die_union = die_results[1][1]
-        
-        
-        die_confederate = random.randrange(6)+1
-        die_union = random.randrange(6)+1
-        
-        
-        
-        
-        
-        init_result = ""
-        if die_union > die_confederate: init_result = "Union initiative" 
-        else: init_result = "Confederate initiative"
-        Label (self.action_frame,text="Confederate Die:", font = 'Helvetica 12',bg=text_bg).grid(row = 2, column=1,columnspan=1)
-        Label (self.action_frame,text="Union Die:", font = 'Helvetica 12',bg=text_bg).grid(row = 3, column=1,columnspan=1) 
-        Label (self.action_frame,text="Winner:", font = 'Helvetica 12 bold',bg=text_bg).grid(row = 4, column=1,columnspan=1) 
-        Label (self.action_frame,text=str(die_confederate), font = 'Helvetica 12',bg=text_bg).grid(row = 2, column=2,columnspan=1)
-        Label (self.action_frame,text=str(die_union), font = 'Helvetica 12',bg=text_bg).grid(row = 3, column=2,columnspan=1) 
-        Label (self.action_frame,text=init_result, font = 'Helvetica 12 bold',fg='dark blue',bg=text_bg).grid(row = 4, column=2,columnspan=1) 
-        add_event('Initiative','Union','-','-',die_union,'-',init_result,'-')
-        add_event('Initiative','Confederate','-','-',die_confederate,'-',init_result,'-')
-        # adds an event to the event_log
-        # event: the name of the event
-        # side: which side caused the event ("Union","Confederate" or "Both")
-        # unit: unit involved in the action (could be a leader)
-        # location: hex location of noted action
-        # die_roll: result of one or two d6
-        # die_roll_mod: modifier to the die roll
-        # result: result of action
-        # notes: misc notes adding explanation to action
-
-        
-        global_phase='Initiative'
-        
-        self.update_stuff()
-
     def leader_transfer(self):
         
         def do_it():
@@ -384,23 +338,83 @@ class Dashboard():
         
         Button(self.action_frame, text='Cancel', command=self.action_window).grid(row=10, column=1, sticky=W, padx=4)
         Button(self.action_frame, text='OK', command=do_it).grid(row=10, column=2, sticky=W, padx=4)
+
+        
+    def roll_initiative(self):
+        global global_phase
+        
+        self.action_window()
+
+        
+        die_results = self.roll_dice(2)
+        die_total = die_results[0]
+        die_confederate = die_results[1][0]
+        die_union = die_results[1][1]
+        
+        
+        
+        init_result = ""
+        if die_union > die_confederate: init_result = "Union initiative" 
+        else: init_result = "Confederate initiative"
+        Label (self.action_frame,text="Confederate Die:", font = 'Helvetica 12',bg=self.text_bg).grid(row = 2, column=1,columnspan=1)
+        Label (self.action_frame,text="Union Die:", font = 'Helvetica 12',bg=self.text_bg).grid(row = 3, column=1,columnspan=1) 
+        Label (self.action_frame,text="Winner:", font = 'Helvetica 12 bold',bg=self.text_bg).grid(row = 4, column=1,columnspan=1) 
+        Label (self.action_frame,text=str(die_confederate), font = 'Helvetica 12',bg=self.text_bg).grid(row = 2, column=2,columnspan=1)
+        Label (self.action_frame,text=str(die_union), font = 'Helvetica 12',bg=self.text_bg).grid(row = 3, column=2,columnspan=1) 
+        Label (self.action_frame,text=init_result, font = 'Helvetica 12 bold',fg='dark blue',bg=self.text_bg).grid(row = 4, column=2,columnspan=1) 
+        add_event('Initiative','Union','-','-',die_union,'-',init_result,'-')
+        add_event('Initiative','Confederate','-','-',die_confederate,'-',init_result,'-')
+        # adds an event to the event_log
+        # event: the name of the event
+        # side: which side caused the event ("Union","Confederate" or "Both")
+        # unit: unit involved in the action (could be a leader)
+        # location: hex location of noted action
+        # die_roll: result of one or two d6
+        # die_roll_mod: modifier to the die roll
+        # result: result of action
+        # notes: misc notes adding explanation to action
+
+        
+        global_phase='Initiative'
+        
+        self.update_stuff()
+
+
         
     def leader_activation(self):
         
         def do_it():
             side_num = choice.get()
             leader_value = leader_entry.get()
-            dice_value = dice_entry.get()
-            mod_value = mod_entry.get()
+            dice_value = int(dice_entry.get())
+            mod_value = int(mod_entry.get())
             unit_value = unit_entry.get()
             
             if side_num == 1: side_value = 'Union'
             else: side_value = 'Confederate'
             
+            dice_results = self.roll_dice(dice_value)
+            dice_total = dice_results[0]
+            event_value = dice_total+mod_value
+            
     
-            add_event('Activation',side_value,leader_value,'-',dice_value,mod_value,'-',unit_value)
-            self.action_window()
+            add_event('Activation',side_value,leader_value,'-',dice_total,mod_value,event_value,unit_value)
             self.update_stuff()
+            self.action_window()
+    
+            for die_num,each_die in enumerate(dice_results[1]):
+                die_num_text = 'Die Roll #' + str(die_num+1) + ': '
+                Label (self.action_frame,text=die_num_text, font = 'Helvetica 12 bold',bg=self.text_bg).grid(row = die_num, column=1,columnspan=1) 
+                Label (self.action_frame,text=each_die, font = 'Helvetica 12 bold',bg=self.text_bg).grid(row = die_num, column=2,columnspan=1) 
+                                
+            
+            Label (self.action_frame,text="Total Die Roll:", font = 'Helvetica 12 bold',bg=self.text_bg).grid(row = 5, column=1,columnspan=1) 
+            Label (self.action_frame,text=dice_total, font = 'Helvetica 12 bold',fg='dark blue',bg=self.text_bg).grid(row = 5, column=2,columnspan=1) 
+            Label (self.action_frame,text="Total after Mod:", font = 'Helvetica 12 bold',bg=self.text_bg).grid(row = 6, column=1,columnspan=1) 
+            Label (self.action_frame,text=event_value, font = 'Helvetica 12 bold',fg='dark blue',bg=self.text_bg).grid(row = 6, column=2,columnspan=1) 
+                
+                
+                
         
         self.action_window()
         
@@ -448,8 +462,7 @@ class Dashboard():
         def do_it():
             side_num = choice.get()
             location_value = location_entry.get()
-            dice_num = int(dice_entry.get())
-            mod_value = int(mod_entry.get())
+
             unit_value = unit_entry.get()
             route_value= route_entry.get()
             active_num = activation.get()
@@ -457,14 +470,32 @@ class Dashboard():
             
             if active_num == 1: 
                 march_text = 'Ldr Act March'
-                dice_value = 0
-                mod_value = 0
+                dice_value = '-'
+                mod_value = '-'
                 result_value = 0
+                self.action_window()
             elif active_num == 0:
+                dice_num = int(dice_entry.get())
+                mod_value = int(mod_entry.get())
                 march_text = 'Unit March'
                 dice_result = self.roll_dice(dice_num)
                 dice_value = dice_result[0]
                 result_value = dice_value + mod_value
+                self.action_window()
+                for die_num,each_die in enumerate(dice_result[1]):
+                    die_num_text = 'Die Roll #' + str(die_num+1) + ': '
+                    Label (self.action_frame,text=die_num_text, font = 'Helvetica 12 bold',bg=self.text_bg).grid(row = die_num, column=1,columnspan=1) 
+                    Label (self.action_frame,text=each_die, font = 'Helvetica 12 bold',bg=self.text_bg).grid(row = die_num, column=2,columnspan=1) 
+                                    
+            
+                Label (self.action_frame,text="Total Die Roll:", font = 'Helvetica 12 bold',bg=self.text_bg).grid(row = 5, column=1,columnspan=1) 
+                Label (self.action_frame,text=dice_value, font = 'Helvetica 12 bold',fg='dark blue',bg=self.text_bg).grid(row = 5, column=2,columnspan=1) 
+                Label (self.action_frame,text="Total after Mod:", font = 'Helvetica 12 bold',bg=self.text_bg).grid(row = 6, column=1,columnspan=1) 
+                Label (self.action_frame,text=result_value, font = 'Helvetica 12 bold',fg='dark blue',bg=self.text_bg).grid(row = 6, column=2,columnspan=1) 
+                 
+                
+            
+            
             else:
                 march_text = 'March Error'
             
@@ -473,7 +504,7 @@ class Dashboard():
             
     
             add_event(march_text,side_value,unit_value,location_value,dice_value,mod_value,result_value,route_value)
-            self.action_window()
+
             self.update_stuff()
         
         self.action_window()
@@ -596,8 +627,6 @@ class Dashboard():
         self.action_frame.grid(column=20,row=10,columnspan=10,rowspan=10,sticky = (N,W),padx=10)
         self.action_frame.grid_propagate(0)
         
-
-
         
     def increment_turn(self):
         global global_turn
