@@ -137,10 +137,18 @@ class Dashboard():
         self.button_initiative.grid(row=4,column=1,pady=4,sticky=(NW))
         self.button_activation=Button(self.action_button_frame,text='Ldr Activation',command=self.leader_activation,width=15)
         self.button_activation.grid(row=5,column=1,pady=4,sticky=(NW))
-        self.button_march=Button(self.action_button_frame,text='March',command=self.march,width=15)
+        self.button_march=Button(self.action_button_frame,text='Roll for March',command=self.roll_for_march,width=15)
         self.button_march.grid(row=6,column=1,pady=4,sticky=(NW))
+        self.button_march=Button(self.action_button_frame,text='Extended March',command=self.roll_for_extended_march,width=15)
+        self.button_march.grid(row=7,column=1,pady=4,sticky=(NW))
+        self.button_march=Button(self.action_button_frame,text='Force March',command=self.roll_for_force_march,width=15)
+        self.button_march.grid(row=8,column=1,pady=4,sticky=(NW))
+        self.button_march=Button(self.action_button_frame,text='March',command=self.move_location,width=15)
+        self.button_march.grid(row=9,column=1,pady=4,sticky=(NW))
+        self.button_march=Button(self.action_button_frame,text='Cav Retreat',command=self.roll_for_cav_retreat,width=15)
+        self.button_march.grid(row=10,column=1,pady=4,sticky=(NW))
         self.button_comment=Button(self.action_button_frame,text='Comment',command=self.comment,width=15)
-        self.button_comment.grid(row=10,column=1,pady=4,sticky=(NW))
+        self.button_comment.grid(row=20,column=1,pady=4,sticky=(NW))
         
        
     def update_stuff(self):
@@ -393,8 +401,8 @@ class Dashboard():
             if side_num == 1: side_value = 'Union'
             else: side_value = 'Confederate'
             
-            dice_results = self.roll_dice(dice_value)
-            dice_total = dice_results[0]
+            dice_result = self.roll_dice(dice_value)
+            dice_total = dice_result[0]
             event_value = dice_total+mod_value
             
     
@@ -402,19 +410,12 @@ class Dashboard():
             self.update_stuff()
             self.action_window()
     
-            for die_num,each_die in enumerate(dice_results[1]):
-                die_num_text = 'Die Roll #' + str(die_num+1) + ': '
-                Label (self.action_frame,text=die_num_text, font = 'Helvetica 12 bold',bg=self.text_bg).grid(row = die_num, column=1,columnspan=1) 
-                Label (self.action_frame,text=each_die, font = 'Helvetica 12 bold',bg=self.text_bg).grid(row = die_num, column=2,columnspan=1) 
-                                
-            
-            Label (self.action_frame,text="Total Die Roll:", font = 'Helvetica 12 bold',bg=self.text_bg).grid(row = 5, column=1,columnspan=1) 
-            Label (self.action_frame,text=dice_total, font = 'Helvetica 12 bold',fg='dark blue',bg=self.text_bg).grid(row = 5, column=2,columnspan=1) 
-            Label (self.action_frame,text="Total after Mod:", font = 'Helvetica 12 bold',bg=self.text_bg).grid(row = 6, column=1,columnspan=1) 
-            Label (self.action_frame,text=event_value, font = 'Helvetica 12 bold',fg='dark blue',bg=self.text_bg).grid(row = 6, column=2,columnspan=1) 
-                
-                
-                
+            alabel,blabel,clabel,dlabel,dice_value,result_value = self.die_window(dice_result,mod_value)
+            alabel
+            blabel
+            clabel
+            dlabel           
+                        
         
         self.action_window()
         
@@ -446,63 +447,48 @@ class Dashboard():
         Button(self.action_frame, text='Cancel', command=self.action_window).grid(row=10, column=1, sticky=W, padx=4, pady = 10)
         Button(self.action_frame, text='OK', command=do_it).grid(row=10, column=2, sticky=W, padx=4, pady=10)       
         
-    def march(self):
+    def roll_for_march(self):
 
-        def enable_dice_options():
-            Label(self.action_frame, text="# Dice").grid(row=8,column=1,sticky=W)
-            dice_entry = Entry(self.action_frame,state=DISABLED if activation.get() else NORMAL)
-            dice_entry.grid(row=8,column=2,pady=4,padx=4)
-            
-            Label(self.action_frame, text="Mod").grid(row=9,column=1,sticky=W)
-            mod_entry = Entry(self.action_frame,state=DISABLED if activation.get() else NORMAL)
-            mod_entry.grid(row=9,column=2,pady=4,padx=4)
+#        def enable_dice_options():
+#            Label(self.action_frame, text="# Dice").grid(row=8,column=1,sticky=W)
+#            dice_entry = Entry(self.action_frame,state=DISABLED if activation.get() else NORMAL)
+#            dice_entry.grid(row=8,column=2,pady=4,padx=4)
+#            
+#            Label(self.action_frame, text="Mod").grid(row=9,column=1,sticky=W)
+#            mod_entry = Entry(self.action_frame,state=DISABLED if activation.get() else NORMAL)
+#            mod_entry.grid(row=9,column=2,pady=4,padx=4)
 
 
         
         def do_it():
             side_num = choice.get()
-            location_value = location_entry.get()
+            location_value = "-"
 
             unit_value = unit_entry.get()
-            route_value= route_entry.get()
-            active_num = activation.get()
+            route_value= "-"
+            active_num = 0
             
-            
-            if active_num == 1: 
-                march_text = 'Ldr Act March'
-                dice_value = '-'
-                mod_value = '-'
-                result_value = 0
-                self.action_window()
-            elif active_num == 0:
-                dice_num = int(dice_entry.get())
-                mod_value = int(mod_entry.get())
-                march_text = 'Unit March'
-                dice_result = self.roll_dice(dice_num)
-                dice_value = dice_result[0]
-                result_value = dice_value + mod_value
-                self.action_window()
-                for die_num,each_die in enumerate(dice_result[1]):
-                    die_num_text = 'Die Roll #' + str(die_num+1) + ': '
-                    Label (self.action_frame,text=die_num_text, font = 'Helvetica 12 bold',bg=self.text_bg).grid(row = die_num, column=1,columnspan=1) 
-                    Label (self.action_frame,text=each_die, font = 'Helvetica 12 bold',bg=self.text_bg).grid(row = die_num, column=2,columnspan=1) 
-                                    
-            
-                Label (self.action_frame,text="Total Die Roll:", font = 'Helvetica 12 bold',bg=self.text_bg).grid(row = 5, column=1,columnspan=1) 
-                Label (self.action_frame,text=dice_value, font = 'Helvetica 12 bold',fg='dark blue',bg=self.text_bg).grid(row = 5, column=2,columnspan=1) 
-                Label (self.action_frame,text="Total after Mod:", font = 'Helvetica 12 bold',bg=self.text_bg).grid(row = 6, column=1,columnspan=1) 
-                Label (self.action_frame,text=result_value, font = 'Helvetica 12 bold',fg='dark blue',bg=self.text_bg).grid(row = 6, column=2,columnspan=1) 
-                 
-                
-            
-            
-            else:
-                march_text = 'March Error'
-            
+
+
+            dice_num = int(dice_entry.get())
+            mod_value = int(mod_entry.get())
+            march_text = 'Unit March Roll'
+            dice_result = self.roll_dice(dice_num)
+            dice_value = dice_result[0]
+            result_value = dice_value + mod_value
+            self.action_window()
+
+            alabel,blabel,clabel,dlabel,dice_value,result_value = self.die_window(dice_result,mod_value)
+            alabel
+            blabel
+            clabel
+            dlabel           
+                     
+       
             if side_num == 1: side_value = 'Union'
             else: side_value = 'Confederate'
             
-    
+
             add_event(march_text,side_value,unit_value,location_value,dice_value,mod_value,result_value,route_value)
 
             self.update_stuff()
@@ -519,17 +505,9 @@ class Dashboard():
         unit_entry = Entry(self.action_frame)
         unit_entry.grid(row=4,column=2,pady=4)
         
-        Label(self.action_frame, text="Final Location").grid(row=5,column=1,sticky=W)
-        location_entry = Entry(self.action_frame)
-        location_entry.grid(row=5,column=2,pady=4,padx=4)
-        
-        Label(self.action_frame, text="Route").grid(row=6,column=1,sticky=W)
-        route_entry = Entry(self.action_frame)
-        route_entry.grid(row=6,column=2,pady=4,padx=4)
-        
-        activation = IntVar()
-        Checkbutton(self.action_frame, text="Part of Leader Activation", variable=activation,
-                    command=enable_dice_options).grid(row=7,column=1)
+#        activation = IntVar()
+#        Checkbutton(self.action_frame, text="Part of Leader Activation", variable=activation,
+#                    command=enable_dice_options).grid(row=7,column=1)
         
         Label(self.action_frame, text="# Dice").grid(row=8,column=1,sticky=W)
         dice_entry = Entry(self.action_frame)
@@ -545,45 +523,242 @@ class Dashboard():
         Button(self.action_frame, text='OK', command=do_it).grid(row=10, column=2, sticky=W, padx=4, pady=10)         
 
 
-    def extended_march(self):
+    def roll_for_extended_march(self):
 
         
         def do_it():
             side_num = choice.get()
-            location_value = location_entry.get()
+            location_value = "-"
+
+            unit_value = unit_entry.get()
+            route_value= "-"
+            dice_num = 1
+            mod_value = int(mod_entry.get())
+            march_text = 'Extended March'
+            dice_result = self.roll_dice(dice_num)
+            dice_value = dice_result[0]
+            result_value = dice_value + mod_value
+            self.action_window()
+
+            alabel,blabel,clabel,dlabel,dice_value,result_value = self.die_window(dice_result,mod_value)
+            alabel
+            blabel
+            clabel
+            dlabel           
+                     
+            
+            if side_num == 1: side_value = 'Union'
+            else: side_value = 'Confederate'
+            
+
+            add_event(march_text,side_value,unit_value,location_value,dice_value,mod_value,result_value,route_value)
+
+            self.update_stuff()
+        
+        self.action_window()
+        
+        choice = IntVar()
+        choice.set(1)
+        Label(self.action_frame, text="Side:").grid(row=1,column =1,sticky=W)
+        Radiobutton(self.action_frame,text="Union",padx=20,variable=choice,value=1).grid(row=2,column=1,sticky=W)
+        Radiobutton(self.action_frame,text="Confederate",padx=20,variable=choice,value=2).grid(row=3,column=1,sticky=W)
+        
+        Label(self.action_frame, text="Unit").grid(row=4,column=1,sticky=W)
+        unit_entry = Entry(self.action_frame)
+        unit_entry.grid(row=4,column=2,pady=4)
+        
+              
+        Label(self.action_frame, text="Mod").grid(row=9,column=1,sticky=W)
+        mod_entry = Entry(self.action_frame)
+        mod_entry.grid(row=9,column=2,pady=4,padx=4)
+
+
+      
+        Button(self.action_frame, text='Cancel', command=self.action_window).grid(row=10, column=1, sticky=W, padx=4, pady = 10)
+        Button(self.action_frame, text='OK', command=do_it).grid(row=10, column=2, sticky=W, padx=4, pady=10)   
+        
+        
+    def roll_for_force_march(self):
+
+#        def enable_dice_options():
+#            Label(self.action_frame, text="# Dice").grid(row=8,column=1,sticky=W)
+#            dice_entry = Entry(self.action_frame,state=DISABLED if activation.get() else NORMAL)
+#            dice_entry.grid(row=8,column=2,pady=4,padx=4)
+#            
+#            Label(self.action_frame, text="Mod").grid(row=9,column=1,sticky=W)
+#            mod_entry = Entry(self.action_frame,state=DISABLED if activation.get() else NORMAL)
+#            mod_entry.grid(row=9,column=2,pady=4,padx=4)
+
+
+        
+        def do_it():
+            side_num = choice.get()
+            location_value = "-"
+
+            unit_value = unit_entry.get()
+            route_value= "-"
+            active_num = 0
+            
+
+
             dice_num = int(dice_entry.get())
             mod_value = int(mod_entry.get())
-            unit_value = unit_entry.get()
-            route_value= route_entry.get()
-            active_num = activation.get()
+            march_text = 'Force March'
+            dice_result = self.roll_dice(dice_num)
+            dice_value = dice_result[0]
+            result_value = dice_value + mod_value
+            self.action_window()
             
+            alabel,blabel,clabel,dlabel,dice_value,result_value = self.die_window(dice_result,mod_value)
+            alabel
+            blabel
+            clabel
+            dlabel           
+        
+        
+
         
             if side_num == 1: side_value = 'Union'
             else: side_value = 'Confederate'
             
-    
+
             add_event(march_text,side_value,unit_value,location_value,dice_value,mod_value,result_value,route_value)
+
+            self.update_stuff()
+        
+        self.action_window()
+        
+        choice = IntVar()
+        choice.set(1)
+        Label(self.action_frame, text="Side:").grid(row=1,column =1,sticky=W)
+        Radiobutton(self.action_frame,text="Union",padx=20,variable=choice,value=1).grid(row=2,column=1,sticky=W)
+        Radiobutton(self.action_frame,text="Confederate",padx=20,variable=choice,value=2).grid(row=3,column=1,sticky=W)
+        
+        Label(self.action_frame, text="Unit").grid(row=4,column=1,sticky=W)
+        unit_entry = Entry(self.action_frame)
+        unit_entry.grid(row=4,column=2,pady=4)
+        
+#        activation = IntVar()
+#        Checkbutton(self.action_frame, text="Part of Leader Activation", variable=activation,
+#                    command=enable_dice_options).grid(row=7,column=1)
+        
+        Label(self.action_frame, text="# Dice").grid(row=8,column=1,sticky=W)
+        dice_entry = Entry(self.action_frame)
+        dice_entry.grid(row=8,column=2,pady=4,padx=4)
+        
+        Label(self.action_frame, text="Mod").grid(row=9,column=1,sticky=W)
+        mod_entry = Entry(self.action_frame)
+        mod_entry.grid(row=9,column=2,pady=4,padx=4)
+
+
+      
+        Button(self.action_frame, text='Cancel', command=self.action_window).grid(row=10, column=1, sticky=W, padx=4, pady = 10)
+        Button(self.action_frame, text='OK', command=do_it).grid(row=10, column=2, sticky=W, padx=4, pady=10)         
+        
+        
+
+
+    def move_location(self):
+        
+        def do_it():
+            side_num = choice.get()
+            unit_value = unit_entry.get()
+            location_value = location_entry.get()
+            route_value = route_entry.get()
+            
+            if side_num == 1: side_value = 'Union'
+            else: side_value = 'Confederate'
+    
+            add_event('March',side_value,unit_value,location_value,'-','-','-',route_value)
             self.action_window()
             self.update_stuff()
         
         self.action_window()
         
-        Label(self.action_frame, text="Mod").grid(row=9,column=1,sticky=W)
+        choice = IntVar()
+        choice.set(1)
+        Label(self.action_frame, text="Side:").grid(row=1,column =1,sticky=W)
+        Radiobutton(self.action_frame,text="Union",padx=20,variable=choice,value=1,bg='sky blue').grid(row=2,column=1,sticky=W)
+        Radiobutton(self.action_frame,text="Confederate",padx=20,variable=choice,value=2).grid(row=3,column=1,sticky=W)
+
+        Label(self.action_frame, text="Unit:").grid(row=4,column =1,sticky=W)
+        unit_entry = Entry(self.action_frame)
+        unit_entry.grid(row=4,column=2,pady=4)
+        
+        Label(self.action_frame, text="New Location:").grid(row=5,column=1,sticky=W)
+        location_entry = Entry(self.action_frame)
+        location_entry.grid(row=5,column=2,pady=4)
+        
+        Label(self.action_frame, text="Route:").grid(row=6,column=1,sticky=W)
+        route_entry = Entry(self.action_frame)
+        route_entry.grid(row=6,column=2,pady=4,padx=4)
+        
+        
+        Button(self.action_frame, text='Cancel', command=self.action_window).grid(row=10, column=1, sticky=W, padx=4)
+        Button(self.action_frame, text='OK', command=do_it).grid(row=10, column=2, sticky=W, padx=4)
+        
+        
+    def roll_for_cav_retreat(self):
+
+       
+        def do_it():
+            side_num = choice.get()
+            location_value = location_entry.get()
+
+            unit_value = unit_entry.get()
+            route_value= route_entry.get()
+           
+            dice_num = 1
+            mod_value = int(mod_entry.get())
+            march_text = 'Cav Retreat'
+            dice_result = self.roll_dice(dice_num)
+
+
+            self.action_window()
+
+            alabel,blabel,clabel,dlabel,dice_value,result_value = self.die_window(dice_result,mod_value)
+            alabel
+            blabel
+            clabel
+            dlabel
+        
+            if side_num == 1: side_value = 'Union'
+            else: side_value = 'Confederate'
+            
+
+            add_event(march_text,side_value,unit_value,location_value,dice_value,mod_value,result_value,route_value)
+
+            self.update_stuff()
+        
+        self.action_window()
+        
+        choice = IntVar()
+        choice.set(1)
+        Label(self.action_frame, text="Side:").grid(row=1,column =1,sticky=W)
+        Radiobutton(self.action_frame,text="Union",padx=20,variable=choice,value=1).grid(row=2,column=1,sticky=W)
+        Radiobutton(self.action_frame,text="Confederate",padx=20,variable=choice,value=2).grid(row=3,column=1,sticky=W)
+        
+        Label(self.action_frame, text="Unit").grid(row=4,column=1,sticky=W)
+        unit_entry = Entry(self.action_frame)
+        unit_entry.grid(row=4,column=2,pady=4)
+        
+        Label(self.action_frame, text="Mod").grid(row=5,column=1,sticky=W)
         mod_entry = Entry(self.action_frame)
-        mod_entry.grid(row=9,column=2,pady=4,padx=4)
+        mod_entry.grid(row=5,column=2,pady=4,padx=4)
         
-        Label(self.action_frame, text="Route").grid(row=6,column=1,sticky=W)
-        route_entry = Entry(self.action_frame)
-        route_entry.grid(row=6,column=2,pady=4,padx=4)
+        Label(self.action_frame, text="Final location").grid(row=6,column=1,sticky=W)
+        location_entry = Entry(self.action_frame)
+        location_entry.grid(row=6,column=2,pady=4,padx=4)
         
-        Label(self.action_frame, text="Route").grid(row=6,column=1,sticky=W)
+        Label(self.action_frame, text="Route").grid(row=7,column=1,sticky=W)
         route_entry = Entry(self.action_frame)
-        route_entry.grid(row=6,column=2,pady=4,padx=4)
+        route_entry.grid(row=7,column=2,pady=4,padx=4)
+
 
       
         Button(self.action_frame, text='Cancel', command=self.action_window).grid(row=10, column=1, sticky=W, padx=4, pady = 10)
-        Button(self.action_frame, text='OK', command=do_it).grid(row=10, column=2, sticky=W, padx=4, pady=10)         
-
+        Button(self.action_frame, text='OK', command=do_it).grid(row=10, column=2, sticky=W, padx=4, pady=10)    
+        
 
 
 
@@ -639,6 +814,21 @@ class Dashboard():
         add_event('New Turn','Both','-','-','-','-','Turn #' + str(global_turn),'-')
                  
         self.update_stuff()
+        
+    
+    def die_window(self,dice_result,mod_value):    
+        for die_num,each_die in enumerate(dice_result[1]):
+            die_num_text = 'Die Roll #' + str(die_num+1) + ': '
+            Label (self.action_frame,text=die_num_text, font = 'Helvetica 12 bold',bg=self.text_bg).grid(row = die_num, column=1,columnspan=1) 
+            Label (self.action_frame,text=each_die, font = 'Helvetica 12 bold',bg=self.text_bg).grid(row = die_num, column=2,columnspan=1) 
+                                
+        dice_value = dice_result[0]
+        result_value = dice_value + mod_value
+        alabel = Label (self.action_frame,text="Total Die Roll:", font = 'Helvetica 12 bold',bg=self.text_bg).grid(row = 5, column=1,columnspan=1) 
+        blabel = Label (self.action_frame,text=dice_value, font = 'Helvetica 12 bold',fg='dark blue',bg=self.text_bg).grid(row = 5, column=2,columnspan=1) 
+        clabel = Label (self.action_frame,text="Total after Mod:", font = 'Helvetica 12 bold',bg=self.text_bg).grid(row = 6, column=1,columnspan=1) 
+        dlabel = Label (self.action_frame,text=result_value, font = 'Helvetica 12 bold',fg='dark blue',bg=self.text_bg).grid(row = 6, column=2,columnspan=1) 
+        return(alabel,blabel,clabel,dlabel,dice_value,result_value)
         
         
         
