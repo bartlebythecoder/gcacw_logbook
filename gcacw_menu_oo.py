@@ -23,7 +23,8 @@ def add_event(event,side,unit,location,die_roll,die_roll_mod,result,notes):
     global global_event_log
     event_no = len(global_event_log)+1
     global_event_log[event_no] = (event,side,unit,location,die_roll,die_roll_mod,result,notes)
-    
+    with open('spotsylvania.csv', 'a') as f:
+        print(global_event_log[event_no], file=f)    
 
      
     
@@ -69,10 +70,6 @@ class Dashboard():
         self.master.geometry('1400x700')
         self.master.title('Log Book for Bloody Spotsylvania')
         
-#        background_image=PhotoImage(file='wallpaper.gif')
-#        self.background_label = Label(self.master, image=background_image)
-#        self.background_label.image = background_image
-#        self.background_label.place(x=0, y=0, relwidth=1, relheight=1)
         self.text_bg = 'sky blue'
                      
       
@@ -147,7 +144,11 @@ class Dashboard():
         self.button_march.grid(row=9,column=1,pady=4,sticky=(NW))
         self.button_march=Button(self.action_button_frame,text='Cav Retreat',command=self.roll_for_cav_retreat,width=15)
         self.button_march.grid(row=10,column=1,pady=4,sticky=(NW))
-        self.button_comment=Button(self.action_button_frame,text='Comment',command=self.comment,width=15)
+        self.button_march=Button(self.action_button_frame,text='(Grand) Assault',command=self.roll_for_assault,width=15)
+        self.button_march.grid(row=11,column=1,pady=4,sticky=(NW))
+        self.button_comment=Button(self.action_button_frame,text='Roll Attack',command=self.roll_for_attack,width=15)
+        self.button_comment.grid(row=12,column=1,pady=4,sticky=(NW))
+        self.button_comment=Button(self.action_button_frame,text='Roll/Comment',command=self.comment,width=15)
         self.button_comment.grid(row=20,column=1,pady=4,sticky=(NW))
         
        
@@ -536,8 +537,6 @@ class Dashboard():
             mod_value = int(mod_entry.get())
             march_text = 'Extended March'
             dice_result = self.roll_dice(dice_num)
-            dice_value = dice_result[0]
-            result_value = dice_value + mod_value
             self.action_window()
 
             alabel,blabel,clabel,dlabel,dice_value,result_value = self.die_window(dice_result,mod_value)
@@ -605,8 +604,6 @@ class Dashboard():
             mod_value = int(mod_entry.get())
             march_text = 'Force March'
             dice_result = self.roll_dice(dice_num)
-            dice_value = dice_result[0]
-            result_value = dice_value + mod_value
             self.action_window()
             
             alabel,blabel,clabel,dlabel,dice_value,result_value = self.die_window(dice_result,mod_value)
@@ -759,6 +756,191 @@ class Dashboard():
         Button(self.action_frame, text='Cancel', command=self.action_window).grid(row=10, column=1, sticky=W, padx=4, pady = 10)
         Button(self.action_frame, text='OK', command=do_it).grid(row=10, column=2, sticky=W, padx=4, pady=10)    
         
+    def roll_for_assault(self):
+
+        
+        def do_it():
+            side_num = choice.get()
+            location_value = "-"
+            unit_value = unit_entry.get()
+            leader_value = leader_entry.get()
+            dice_num = 1
+            mod_value = int(mod_entry.get())
+            grand_assault_val = grand_assault.get()
+            if grand_assault_val == 0:
+                action_text = 'Assault'
+            else: action_text = 'Grand Assault'
+            dice_result = self.roll_dice(dice_num)
+            self.action_window()
+
+            alabel,blabel,clabel,dlabel,dice_value,result_value = self.die_window(dice_result,mod_value)
+            alabel
+            blabel
+            clabel
+            dlabel           
+                     
+            
+            if side_num == 1: side_value = 'Union'
+            else: side_value = 'Confederate'
+            
+            add_event(action_text,side_value,leader_value,location_value,dice_value,mod_value,result_value,unit_value)
+
+            self.update_stuff()
+        
+        self.action_window()
+        
+        choice = IntVar()
+        choice.set(1)
+        Label(self.action_frame, text="Side:").grid(row=1,column =1,sticky=W)
+        Radiobutton(self.action_frame,text="Union",padx=20,variable=choice,value=1).grid(row=2,column=1,sticky=W)
+        Radiobutton(self.action_frame,text="Confederate",padx=20,variable=choice,value=2).grid(row=3,column=1,sticky=W)
+        
+        grand_assault = IntVar()
+        Checkbutton(self.action_frame, text="Grand Assault", variable=grand_assault).grid(row=4,column=1)
+        
+        Label(self.action_frame, text="Leader").grid(row=5,column=1,sticky=W)
+        leader_entry = Entry(self.action_frame)
+        leader_entry.grid(row=5,column=2,pady=4)
+        
+        Label(self.action_frame, text="Mod").grid(row=9,column=1,sticky=W)
+        mod_entry = Entry(self.action_frame)
+        mod_entry.grid(row=9,column=2,pady=4,padx=4)
+        
+        Label(self.action_frame, text="Participants").grid(row=10,column=1,sticky=W)
+        unit_entry = Entry(self.action_frame)
+        unit_entry.grid(row=10,column=2,pady=4,padx=4)
+        
+              
+        Label(self.action_frame, text="Mod").grid(row=9,column=1,sticky=W)
+        mod_entry = Entry(self.action_frame)
+        mod_entry.grid(row=9,column=2,pady=4,padx=4)
+
+
+      
+        Button(self.action_frame, text='Cancel', command=self.action_window).grid(row=20, column=1, sticky=W, padx=4, pady = 10)
+        Button(self.action_frame, text='OK', command=do_it).grid(row=20, column=2, sticky=W, padx=4, pady=10)           
+        
+    def roll_for_attack(self):
+                
+        def show_it():
+            
+
+            
+            def do_it():
+                union_result_value = union_result_entry.get()
+                confed_result_value = confed_result_entry.get()
+                if attacker_side == 1: 
+                    union_event = 'Attack'
+                    confed_event = 'Defend'
+                    union_unit = unit_value
+                    confed_unit = ''
+                else: 
+                    union_event = 'Defend'
+                    confed_event = 'Attack'
+                    union_unit = ''
+                    confed_unit = unit_value
+                add_event(union_event,'Union',union_unit,target_value,die_union,union_mod_value,union_result_value,'-')
+                add_event(confed_event,'Confederate',confed_unit,target_value,die_confederate,confed_mod_value,confed_result_value,'-')            
+                self.update_stuff()
+                # adds an event to the event_log
+                # event: the name of the event
+                # side: which side caused the event ("Union","Confederate" or "Both")
+                # unit: unit involved in the action (could be a leader)
+                # location: hex location of noted action
+                # die_roll: result of one or two d6
+                # die_roll_mod: modifier to the die roll
+                # result: result of action
+                # notes: misc notes adding explanation to action                
+                self.action_window()
+                
+                
+            union_mod_value = int(union_mod_entry.get())
+            confed_mod_value = int(confed_mod_entry.get())
+            unit_value = unit_entry.get()
+            target_value = target_entry.get()
+            
+            die_results = self.roll_dice(2)
+
+            die_confederate = die_results[1][0]
+            confederate_total = die_confederate + confed_mod_value
+
+            die_union = die_results[1][1]
+            union_total = die_union + union_mod_value
+            
+            die_attack_delta = 0
+            
+
+            attacker_side = choice.get()
+            
+            
+            if attacker_side == 1:
+                die_attack_delta = union_total - confederate_total
+            else:
+                die_attack_delta = confederate_total - union_total
+
+            self.action_window()
+
+            Label (self.action_frame,text="Confederate Die:", font = 'Helvetica 12',bg=self.text_bg).grid(row = 2, column=1,columnspan=1)
+            Label (self.action_frame,text=die_confederate, font = 'Helvetica 12',bg=self.text_bg).grid(row = 2, column=2,columnspan=1)
+            
+            Label (self.action_frame,text="Confederate Mod:", font = 'Helvetica 12',bg=self.text_bg).grid(row = 3, column=1,columnspan=1)
+            Label (self.action_frame,text=confed_mod_value, font = 'Helvetica 12',bg=self.text_bg).grid(row = 3, column=2,columnspan=1)
+            
+            Label (self.action_frame,text="Confederate Total:", font = 'Helvetica 12',bg=self.text_bg).grid(row = 4, column=1,columnspan=1)
+            Label (self.action_frame,text=confederate_total, font = 'Helvetica 12',bg=self.text_bg).grid(row = 4, column=2,columnspan=1)
+            
+            Label (self.action_frame,text="Union Die:", font = 'Helvetica 12',bg=self.text_bg).grid(row = 5, column=1,columnspan=1) 
+            Label (self.action_frame,text=die_union, font = 'Helvetica 12',bg=self.text_bg).grid(row = 5, column=2,columnspan=1) 
+            
+            Label (self.action_frame,text="Union Mod:", font = 'Helvetica 12',bg=self.text_bg).grid(row = 6, column=1,columnspan=1) 
+            Label (self.action_frame,text=union_mod_value, font = 'Helvetica 12',bg=self.text_bg).grid(row = 6, column=2,columnspan=1) 
+            
+            Label (self.action_frame,text="Union Total:", font = 'Helvetica 12',bg=self.text_bg).grid(row = 7, column=1,columnspan=1) 
+            Label (self.action_frame,text=union_total, font = 'Helvetica 12',bg=self.text_bg).grid(row = 7, column=2,columnspan=1) 
+            
+            Label (self.action_frame,text="Attack minus Defense:", font = 'Helvetica 12 bold',bg=self.text_bg).grid(row = 8, column=1,columnspan=1) 
+            Label (self.action_frame,text=die_attack_delta, font = 'Helvetica 12 bold',bg=self.text_bg).grid(row = 8, column=2,columnspan=1) 
+            
+            Label (self.action_frame,text="Union Result:", font = 'Helvetica 12',bg=self.text_bg).grid(row = 9, column=1,columnspan=1)
+            union_result_entry = Entry(self.action_frame)
+            union_result_entry.grid(row=9,column=2,pady=4,padx=4)
+            
+            Label (self.action_frame,text="Confederate Result:", font = 'Helvetica 12',bg=self.text_bg).grid(row = 10, column=1,columnspan=1)
+            confed_result_entry = Entry(self.action_frame)
+            confed_result_entry.grid(row=10,column=2,pady=4,padx=4)
+            
+            Button(self.action_frame, text='Cancel', command=self.action_window).grid(row=20, column=1, sticky=W, padx=4)
+            Button(self.action_frame, text='OK', command=do_it).grid(row=20, column=2, sticky=W, padx=4)   
+            
+
+        
+        self.action_window()
+        
+        choice = IntVar()
+        choice.set(1)
+        Label(self.action_frame, text="Side:").grid(row=1,column =1,sticky=W)
+        Radiobutton(self.action_frame,text="Union",padx=20,variable=choice,value=1).grid(row=2,column=1,sticky=W)
+        Radiobutton(self.action_frame,text="Confederate",padx=20,variable=choice,value=2).grid(row=3,column=1,sticky=W)
+        
+        
+        Label(self.action_frame, text="Unit").grid(row=4,column=1,sticky=W)
+        unit_entry = Entry(self.action_frame)
+        unit_entry.grid(row=4,column=2,pady=4)
+        
+        Label(self.action_frame, text="Target Hex").grid(row=5,column =1,sticky=W,pady=4)
+        target_entry = Entry(self.action_frame)
+        target_entry.grid(row=5,column=2)
+
+        Label(self.action_frame, text="Union Mod").grid(row=6,column=1,sticky=W)
+        union_mod_entry = Entry(self.action_frame)
+        union_mod_entry.grid(row=6,column=2,pady=4,padx=4)
+        
+        Label(self.action_frame, text="Confed Mod").grid(row=7,column=1,sticky=W)
+        confed_mod_entry = Entry(self.action_frame)
+        confed_mod_entry.grid(row=7,column=2,pady=4,padx=4)
+        
+        Button(self.action_frame, text='Cancel', command=self.action_window).grid(row=20, column=1, sticky=W, padx=4)
+        Button(self.action_frame, text='OK', command=show_it).grid(row=20, column=2, sticky=W, padx=4)      
 
 
 
@@ -768,6 +950,22 @@ class Dashboard():
             union_num = union.get()
             confed_num= confed.get()
             comment_entry = p_comment.get()
+            
+            dice_num = int(dice_entry.get())
+            mod_value = int(mod_entry.get())
+            event_text = 'Comment'
+            dice_result = self.roll_dice(dice_num)
+            self.action_window()
+            
+            alabel,blabel,clabel,dlabel,dice_value,result_value = self.die_window(dice_result,mod_value)
+            alabel
+            blabel
+            clabel
+            dlabel           
+            
+            
+            
+            
             if (union_num == 1) and (confed_num ==1):
                 event_side = 'Both'
             elif union_num == 1:
@@ -776,8 +974,7 @@ class Dashboard():
                 event_side = 'Confederate'
             else: event_side = 'None'
     
-            add_event('Comment',event_side,'-','-','-','-',comment_entry,'-')
-            self.action_window()
+            add_event(event_text,event_side,'-','-',dice_value,mod_value,result_value,comment_entry)
             self.update_stuff()
         
         self.action_window()
@@ -785,11 +982,26 @@ class Dashboard():
         confed = IntVar()
         Checkbutton(self.action_frame, text="Union", variable=union).grid(row=1,column=1)
         Checkbutton(self.action_frame, text="Confederate", variable=confed).grid(row=1,column=2)
-        Label(self.action_frame, text="Comment:").grid(row=2,column =1,sticky=W,pady=4)
+        
+        
+        Label(self.action_frame, text="Unit").grid(row=4,column=1,sticky=W)
+        unit_entry = Entry(self.action_frame)
+        unit_entry.grid(row=4,column=2,pady=4)
+        
+        
+        Label(self.action_frame, text="# Dice").grid(row=5,column=1,sticky=W)
+        dice_entry = Entry(self.action_frame)
+        dice_entry.grid(row=5,column=2,pady=4,padx=4)
+        
+        Label(self.action_frame, text="Mod").grid(row=6,column=1,sticky=W)
+        mod_entry = Entry(self.action_frame)
+        mod_entry.grid(row=6,column=2,pady=4,padx=4)
+
+        Label(self.action_frame, text="Comment:").grid(row=7,column =1,sticky=W,pady=4)
         p_comment = Entry(self.action_frame)
-        p_comment.grid(row=2,column=2)
-        Button(self.action_frame, text='Cancel', command=self.action_window).grid(row=3, column=1, sticky=W, padx=4)
-        Button(self.action_frame, text='OK', command=show_it).grid(row=3, column=2, sticky=W, padx=4)
+        p_comment.grid(row=7,column=2)
+        Button(self.action_frame, text='Cancel', command=self.action_window).grid(row=20, column=1, sticky=W, padx=4)
+        Button(self.action_frame, text='OK', command=show_it).grid(row=20, column=2, sticky=W, padx=4)
         
 
         
@@ -798,8 +1010,8 @@ class Dashboard():
             self.action_frame.destroy()
         except:
             print('First Run')
-        self.action_frame = Frame(self.master,width=300,height=300,relief="sunken",bg='skyblue',bd=1)
-        self.action_frame.grid(column=20,row=10,columnspan=10,rowspan=10,sticky = (N,W),padx=10)
+        self.action_frame = Frame(self.master,width=300,height=510,relief="sunken",bg='skyblue',bd=1)
+        self.action_frame.grid(column=20,row=10,columnspan=10,rowspan=20,sticky = (N,W),padx=10)
         self.action_frame.grid_propagate(0)
         
         
@@ -824,13 +1036,17 @@ class Dashboard():
                                 
         dice_value = dice_result[0]
         result_value = dice_value + mod_value
-        alabel = Label (self.action_frame,text="Total Die Roll:", font = 'Helvetica 12 bold',bg=self.text_bg).grid(row = 5, column=1,columnspan=1) 
-        blabel = Label (self.action_frame,text=dice_value, font = 'Helvetica 12 bold',fg='dark blue',bg=self.text_bg).grid(row = 5, column=2,columnspan=1) 
+        
+        if len(dice_result[1]) > 1:
+            alabel = Label (self.action_frame,text="Total Die Roll:", font = 'Helvetica 12 bold',bg=self.text_bg).grid(row = 5, column=1,columnspan=1) 
+            blabel = Label (self.action_frame,text=dice_value, font = 'Helvetica 12 bold',fg='dark blue',bg=self.text_bg).grid(row = 5, column=2,columnspan=1) 
+        else: 
+            alabel = ' '
+            blabel = ' '
+
         clabel = Label (self.action_frame,text="Total after Mod:", font = 'Helvetica 12 bold',bg=self.text_bg).grid(row = 6, column=1,columnspan=1) 
         dlabel = Label (self.action_frame,text=result_value, font = 'Helvetica 12 bold',fg='dark blue',bg=self.text_bg).grid(row = 6, column=2,columnspan=1) 
         return(alabel,blabel,clabel,dlabel,dice_value,result_value)
-        
-        
         
         
 
